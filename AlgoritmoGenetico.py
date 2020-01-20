@@ -32,11 +32,25 @@ def montaVertice(lista):
 
 def gerarMedianas(lista):
     medianas = []
-    for i in range(numMedianas):
-        r = randint(0, len(lista))
+    result = []
+    while True:
+        print('ENTOUU')
+        r = randint(0, numVertices-1)
         if r not in result:
-            mediadas.append(liesta[r])
+            print(r)
+            medianas.append(lista[r])
+            lista[r].mediana = True
+            result.append(r)
+        if len(result) == numMedianas:
+            break
+
+    return medianas
 
 
 listaVestices = montaVertice(listaEntrada)
-gerarMedianas(listaVestices)
+listaMedianas = gerarMedianas(listaVestices)
+
+for i in range(len(listaMedianas)):
+    print("AAAAAAA")
+    print(listaMedianas[i].x)
+    print(listaMedianas[i].y)
