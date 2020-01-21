@@ -98,7 +98,7 @@ def gerarPopulacao():
     n = 0
     s = solucao([], [])
 
-    while (n < 5):
+    while (n < 100):
         dic = {}
         listaVertices = deepcopy(montaVertice(listaEntrada))
         listaMed = deepcopy(gerarMedianas(listaVertices))
