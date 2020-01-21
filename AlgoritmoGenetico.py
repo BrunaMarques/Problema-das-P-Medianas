@@ -1,17 +1,20 @@
 import heapq
 from random import randint
 import math
+from copy import deepcopy
 
 
 class vertice:
-    def __init__(self, x, y, peso, capacidade, mediana):  # construtor
+    def __init__(self, x, y, capacidade, peso, mediana, distM, idM):  # construtor
         self.peso = peso
-        self.capacidade = capacidade
+        self.capacidade = capacidade - peso
+        self.capacidadeR = capacidade
         self.x = x
         self.y = y
         self.mediana = mediana
         self.distM = distM
         self.idM = idM
+        self.alocado = False
 
 
 listaEntrada = []
@@ -21,14 +24,14 @@ numMedianas = int(entrada[1])
 for i in range(numVertices):
     listaEntrada.append(input().split())
 
-print(listaEntrada)
+# print(listaEntrada)
 
 
 def montaVertice(lista):
     listaVertice = []
     for i in range(len(lista)):
         v = vertice(int(lista[i][0]), int(lista[i][1]),
-                    int(lista[i][2]), int(lista[i][3]), False)
+                    int(lista[i][2]), int(lista[i][3]), False, None, None)
         listaVertice.append(v)
     return listaVertice
 
@@ -39,7 +42,6 @@ def gerarMedianas(lista):
     while True:
         r = randint(0, numVertices-1)
         if r not in result:
-            lista[r].capacidade = lista[r].capacidade - lista[r].peso
             medianas.append(lista[r])
             lista[r].mediana = True
             result.append(r)
@@ -50,33 +52,60 @@ def gerarMedianas(lista):
 
 
 def distanciaMediana(listaV, listaM):
-    distancia = tuple()
-    matriz = []
-    tupla = tuple()
-    capacidade = 0
-    dic = {}
+    distancia = ()
     aux = []
-    for i in range(numVertices):
-        if listaV[i].mediana == True:
-            continue
-        for j in range(numMedianas):
-            distancia = ((math.sqrt(
-                (listaV[i].x-listaM[j].x)**2 + (listaV[i].y-listaM[j].y)**2)), j)
-            aux.append(distancia)
-        matriz.append(aux)
+    print(len(listaV))
+    for i in range(len(listaV)):
+        if listaV[i].mediana != True:
+            for j in range(len(listaM)):
+                distancia = ((math.sqrt(
+                    (listaV[i].x-listaM[j].x)**2 + (listaV[i].y-listaM[j].y)**2)), j)
+                aux.append(distancia)
+            listaV[i].distM = sorted(aux)
+            # print('\n\ni = ', i, 'distM = ', listaV[i].distM)
         distancia = []
         aux = []
 
-    print("matriz: ", matriz)
+    for i in listaV:
+        print(i.idM)
 
-# def conectaVertices(listaV, listaM):
+
+def conectaVertices(listaV, listaM):
+    v = []
+    dic = {}
+    distanciaMediana(listaV, listaM)
+    for j in range(len(listaM)):
+        for i in range(len(listaV)):
+            print(j)
+            print('mediana v', listaV[i].idM)
+            if listaV[i].mediana == True:
+                continue
+            elif listaM[j].capacidade < listaV[i].peso:
+                continue
+            elif listaV[i].alocado == False:
+                for k in range(5):
+                    print('KKKKK')
+                    print(listaV[i].idM)
+                    if listaV[i].idM[k][1] == j:
+                        print('Entrou IF ==')
+                        listaM[j].capacidade = listaM[j].capacidade - \
+                            listaV[i].peso
+                        v.append(i)
+                        alocado = True
+                        print('BBB')
+        dic[j] = v
+        v = []
+        print('AAAAAAA')
+        print('No for: ', dic)
+    print('Fora', dic)
 
 
 listaVertices = montaVertice(listaEntrada)
 listaMedianas, posicaoMedianas = gerarMedianas(listaVertices)
 distanciaMediana(listaVertices, listaMedianas)
+#conectaVertices(listaVertices, listaMedianas)
 
-# for i in range(len(listaMedianas)):
+# for i in (listaVertices):
 #     print("AAAAAAA")
-#     print(listaMedianas[i].x)
-#     print(listaMedianas[i].y)
+#     print(i.idM)
+#     print('\n')
