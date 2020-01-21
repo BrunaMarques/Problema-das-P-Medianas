@@ -54,20 +54,17 @@ def gerarMedianas(lista):
 def distanciaMediana(listaV, listaM):
     distancia = ()
     aux = []
-    print(len(listaV))
     for i in range(len(listaV)):
         if listaV[i].mediana != True:
             for j in range(len(listaM)):
                 distancia = ((math.sqrt(
                     (listaV[i].x-listaM[j].x)**2 + (listaV[i].y-listaM[j].y)**2)), j)
                 aux.append(distancia)
+
             listaV[i].distM = sorted(aux)
-            # print('\n\ni = ', i, 'distM = ', listaV[i].distM)
+            #print('\n\ni = ', i, 'distM = ', listaV[i].distM)
         distancia = []
         aux = []
-
-    for i in listaV:
-        print(i.idM)
 
 
 def conectaVertices(listaV, listaM):
@@ -76,34 +73,29 @@ def conectaVertices(listaV, listaM):
     distanciaMediana(listaV, listaM)
     for j in range(len(listaM)):
         for i in range(len(listaV)):
-            print(j)
-            print('mediana v', listaV[i].idM)
             if listaV[i].mediana == True:
                 continue
             elif listaM[j].capacidade < listaV[i].peso:
                 continue
             elif listaV[i].alocado == False:
-                for k in range(5):
-                    print('KKKKK')
-                    print(listaV[i].idM)
-                    if listaV[i].idM[k][1] == j:
-                        print('Entrou IF ==')
+                for k in range(len(listaV[i].distM)):
+                    if listaV[i].distM[k][1] == j:
+                        print("capacidade antes: ", j, listaM[j].capacidade)
+                        print("peso: ", listaV[i].peso)
                         listaM[j].capacidade = listaM[j].capacidade - \
                             listaV[i].peso
+                        print("capacidade depois:", j, listaM[j].capacidade)
                         v.append(i)
-                        alocado = True
-                        print('BBB')
+                        listaV[i].alocado = True
         dic[j] = v
         v = []
-        print('AAAAAAA')
-        print('No for: ', dic)
-    print('Fora', dic)
+    print('dic', dic)
 
 
 listaVertices = montaVertice(listaEntrada)
 listaMedianas, posicaoMedianas = gerarMedianas(listaVertices)
 distanciaMediana(listaVertices, listaMedianas)
-#conectaVertices(listaVertices, listaMedianas)
+conectaVertices(listaVertices, listaMedianas)
 
 # for i in (listaVertices):
 #     print("AAAAAAA")
