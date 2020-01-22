@@ -15,6 +15,7 @@ class vertice:
         self.listdistM = listdistM
         self.distM = distM
         self.alocado = False
+        self.idM = None
 
 
 class solucao:
@@ -44,8 +45,10 @@ def gerarMedianas(lista):
     while True:
         r = randint(0, numVertices-1)
         if r not in result:
+            lista[r].idM = deepcopy(r)
             medianas.append(deepcopy(lista[r]))
             lista[r].mediana = True
+
             result.append(r)
         if len(result) == numMedianas:
             break
@@ -136,6 +139,34 @@ def selecao(listaSol):
     return geradores[0], geradores[1]
 
 
+def cruzamento(pai, mae):
+    filho = solucao([], None)
+    tamanho = len(pai.med)
+    aux2 = []
+    for i in pai.med:
+        for j in mae.med:
+            if i.idM == j.idM:
+                aux2.append(deepcopy(i))
+                filho.med = aux2
+                pai.med.remove(i)
+                mae.med.remove(j)
+    result = []
+    aux = True
+    auxfilho = []
+    while len(filho.med) < tamanho:
+        r = randint(0, len(pai.med)-1)
+        if r not in result:
+            if aux == True:
+                result.append(r)
+                filho.med.append(deepcopy(pai.med[r]))
+                aux = False
+            else:
+                result.append(r)
+                filho.med.append(deepcopy(mae.med[r]))
+                aux = True
+    return filho
+
+
 listaEntrada = []
 entrada = input().split()
 numVertices = int(entrada[0])
@@ -143,7 +174,8 @@ numMedianas = int(entrada[1])
 for i in range(numVertices):
     listaEntrada.append(input().split())
 
-selecao(gerarPopulacao())
+pai, mae = selecao(gerarPopulacao())
+cruzamento(pai, mae)
 
 
 # for i in (listaVertices):
