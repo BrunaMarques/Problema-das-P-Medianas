@@ -62,42 +62,73 @@ def distanciaMediana(listaV, listaM):
                 distancia = ((math.sqrt(
                     (listaV[i].x-listaM[j].x)**2 + (listaV[i].y-listaM[j].y)**2)), j)
                 aux.append(deepcopy(distancia))
-
             listaV[i].listdistM = sorted(aux)
-            #print('\n\ni = ', i, 'distM = ', listaV[i].distM)
+            # print('\n\ni = ', i, 'distM = ', listaV[i].distM)
         distancia = []
         aux = []
 
 
-def conectaVertices(listaV, listaM):
-    dic = {}
+def listaPriori(listaV, listaM):
+    diferenca = []
     distanciaMediana(listaV, listaM)
-    for j in range(len(listaM)):
-        v = []
-        for i in range(len(listaV)):
-            if listaV[i].mediana == True:
+    for i in range(len(listaV)):
+        if listaV[i].mediana == False:
+            aux = (deepcopy(listaV[i].listdistM[0]
+                            [0] - listaV[i].listdistM[1][0]), i)
+            diferenca.append(deepcopy(aux))
+    diferenca = deepcopy(sorted(diferenca))
+    return diferenca
+
+
+def conectaVertices(listaV, listaM):
+    diferenca = []
+    fitness = 0
+    diferenca = deepcopy(listaPriori(listaV, listaM))
+    for i in diferenca:
+        for j in listaV[i[1]].listdistM:
+            if listaV[i[1]].alocado == True:
                 continue
-            elif listaM[j].capacidade < listaV[i].peso:
-                continue
-            elif listaV[i].alocado == False:
-                for k in range(len(listaV[i].listdistM)):
-                    if listaV[i].listdistM[k][1] == j:
-                        listaM[j].capacidade = listaM[j].capacidade - \
-                            listaV[i].peso
-                        v.append(i)
-                        listaV[i].alocado = True
-                        listaV[i].distM = deepcopy(listaV[i].listdistM[k][0])
-        dic[j] = deepcopy(v)
+            if listaV[i[1]].mediana == False:
+                if listaV[i[1]].peso > listaM[j[1]].capacidade:
+                    continue
+                else:
+                    listaM[j[1]].capacidade = deepcopy(listaM[j[1]
+                                                              ].capacidade - listaV[i[1]].peso)
+                    listaV[i[1]].alocado = True
+                    listaV[i[1]].distM = deepcopy(j[0])
 
-    return dic
+                    fitness = fitness + listaV[i[1]].distM
+    return fitness
 
+# def printarSolucao(listaV, listaM):
+#     vertic = []
+#     dic = {}
+#     conectaVertices(listaV, listaM)
+#     for i in listaV:
+#         print("---------")
+#         print(i.mediana)
+#         print(i.idteste)
 
-def fitness(dic, lista):
-    soma = 0
-    for i in dic:
-        for j in dic[i]:
-            soma += lista[j].distM
-    return soma
+    # def conectaVertices(listaV, listaM):
+    #     dic = {}
+    #     distanciaMediana(listaV, listaM)
+    #     for j in range(len(listaM)):
+    #         v = []
+    #         for i in range(len(listaV)):
+    #             if listaV[i].mediana == False:
+    #                 if listaM[j].capacidade < listaV[i].peso:
+    #                     continue
+    #                 elif listaV[i].alocado == False:
+    #                     for k in range(len(listaV[i].listdistM)):
+    #                         if listaV[i].listdistM[k][1] == j:
+    #                             listaM[j].capacidade = listaM[j].capacidade - \
+    #                                 listaV[i].peso
+    #                             v.append(deepcopy(i))
+    #                             listaV[i].alocado = True
+    #                             listaV[i].distM = deepcopy(listaV[i].listdistM[k][0])
+    #         dic[j] = deepcopy(v)
+
+    #     return dic
 
 
 def gerarPopulacao():
@@ -106,12 +137,10 @@ def gerarPopulacao():
     listaSolucao = []
 
     while (n < 100):
-        dic = {}
         listaVertices = deepcopy(montaVertice(listaEntrada))
         listaMed = deepcopy(gerarMedianas(listaVertices))
         s.med = (deepcopy(listaMed))
-        dic = deepcopy(conectaVertices(listaVertices, listaMed))
-        s.fit = (deepcopy(fitness(dic, listaVertices)))
+        s.fit = deepcopy(conectaVertices(listaVertices, listaMed))
         listaSolucao.append(deepcopy(s))
 
         n += 1
@@ -143,7 +172,13 @@ numMedianas = int(entrada[1])
 for i in range(numVertices):
     listaEntrada.append(input().split())
 
-selecao(gerarPopulacao())
+
+listaVertices = deepcopy(montaVertice(listaEntrada))
+listaMed = deepcopy(gerarMedianas(listaVertices))
+#listaPriori(listaVertices, listaMed)
+fitness = conectaVertices(listaVertices, listaMed)
+
+# selecao(gerarPopulacao())
 
 
 # for i in (listaVertices):
