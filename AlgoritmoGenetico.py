@@ -15,6 +15,7 @@ class vertice:
         self.listdistM = listdistM
         self.distM = distM
         self.alocado = False
+        self.idM = None
 
 
 class solucao:
@@ -44,8 +45,10 @@ def gerarMedianas(lista):
     while True:
         r = randint(0, numVertices-1)
         if r not in result:
+            lista[r].idM = deepcopy(r)
             medianas.append(deepcopy(lista[r]))
             lista[r].mediana = True
+
             result.append(r)
         if len(result) == numMedianas:
             break
@@ -144,12 +147,12 @@ def gerarPopulacao():
         listaSolucao.append(deepcopy(s))
 
         n += 1
-    return listaSolucao
+        listaAux = deepcopy(sorted(listaSolucao))
+    return listaAux, listaVertices
 
 
 def selecao(listaSol):
     k = 5
-    i = 0
     result = []
     torneio = []
     while True:
@@ -165,6 +168,70 @@ def selecao(listaSol):
     return geradores[0], geradores[1]
 
 
+def cruzamento(pai, mae):
+    filho = solucao([], None)
+    tamanho = len(pai.med)
+    aux2 = []
+    for i in pai.med:
+        for j in mae.med:
+            if i.idM == j.idM:
+                aux2.append(deepcopy(i))
+                filho.med = aux2
+                pai.med.remove(i)
+                mae.med.remove(j)
+    result = []
+    aux = True
+    while len(filho.med) < tamanho:
+        r = randint(0, len(pai.med)-1)
+        if r not in result:
+            if aux == True:
+                result.append(r)
+                filho.med.append(deepcopy(pai.med[r]))
+                aux = False
+            else:
+                result.append(r)
+                filho.med.append(deepcopy(mae.med[r]))
+                aux = True
+    return filho
+
+
+def mutacao(filho):
+    n = 0
+    result = []
+    print('tamanho do filho.med ', len(filho.med))
+    for i in filho.med:
+        print('filho', i.idM)
+    while n < 2:
+        r = randint(0, (len(filho.med)-1))
+        r2 = randint(0, len(listaVertice)-1)
+        if r not in result:
+            result.append(deepcopy(r))
+            print("R2", r2, 'r', r)
+            if listaVertice[r2].idM != filho.med[r].idM:
+                filho.med.remove(filho.med[r])
+                listaVertice[r2].idM = r2
+                filho.med.append(deepcopy(listaVertice[r2]))
+            n += 1
+    for i in filho.med:
+        print
+        i.capacidade = i.capacidadeR
+        i.mediana = True
+
+    return filho
+
+
+def steadyStated(filho):
+    aux = deepcopy(montaVertice(listaEntrada))
+    filho.fit = deepcopy(fitness(conectaVertices(
+        aux, filho.med), aux))
+    print('fit filho ', filho.fit)
+    print('fit ultimo ', listaSolucao[len(listaSolucao)-1].fit)
+    if filho.fit < listaSolucao[len(listaSolucao)-1].fit:
+        listaSolucao.remove(listaSolucao[len(listaSolucao)-1])
+        listaSolucao.append(filho)
+    print('fit ultimo altualizado ', listaSolucao[len(listaSolucao)-1].fit)
+
+
 listaEntrada = []
 entrada = input().split()
 numVertices = int(entrada[0])
@@ -175,10 +242,14 @@ for i in range(numVertices):
 
 listaVertices = deepcopy(montaVertice(listaEntrada))
 listaMed = deepcopy(gerarMedianas(listaVertices))
-#listaPriori(listaVertices, listaMed)
 fitness = conectaVertices(listaVertices, listaMed)
-
 # selecao(gerarPopulacao())
+listaSolucao, listaVertice = gerarPopulacao()
+pai, mae = selecao(listaSolucao)
+copiaPai = deepcopy(pai)
+copiaMae = deepcopy(mae)
+filho = mutacao(cruzamento(copiaPai, copiaMae))
+steadyStated(filho)
 
 
 # for i in (listaVertices):
