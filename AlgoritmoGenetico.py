@@ -222,8 +222,8 @@ def mutacao(filho):
 
 def steadyStated(filho):
     aux = deepcopy(montaVertice(listaEntrada))
-    filho.fit = deepcopy(fitness(conectaVertices(
-        aux, filho.med), aux))
+    filho.fit = deepcopy(conectaVertices(
+        aux, filho.med))
     print('fit filho ', filho.fit)
     print('fit ultimo ', listaSolucao[len(listaSolucao)-1].fit)
     if filho.fit < listaSolucao[len(listaSolucao)-1].fit:
