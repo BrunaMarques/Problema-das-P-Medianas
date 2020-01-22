@@ -133,13 +133,7 @@ def selecao(listaSol):
 
     geradores = []
     geradores = sorted(torneio)
-    for i in range(5):
-        print(geradores[i].fit)
-    pai = geradores[0]
-    mae = geradores[1]
-
-    print(pai.fit)
-    print(mae.fit)
+    return geradores[0], geradores[1]
 
 
 listaEntrada = []
