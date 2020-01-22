@@ -22,13 +22,19 @@ class solucao:
         self.med = med
         self.fit = fit
 
+    def __gt__(self, other):
+        return self.fit > other.fit
+
+    def __lt__(self, other):
+        return self.fit < other.fit
+
 
 def montaVertice(lista):
     listaVertice = []
     for i in range(len(lista)):
         v = vertice(int(lista[i][0]), int(lista[i][1]),
                     int(lista[i][2]), int(lista[i][3]), False, None, None)
-        listaVertice.append(v)
+        listaVertice.append(deepcopy(v))
     return listaVertice
 
 
@@ -38,7 +44,7 @@ def gerarMedianas(lista):
     while True:
         r = randint(0, numVertices-1)
         if r not in result:
-            medianas.append(lista[r])
+            medianas.append(deepcopy(lista[r]))
             lista[r].mediana = True
             result.append(r)
         if len(result) == numMedianas:
@@ -55,7 +61,7 @@ def distanciaMediana(listaV, listaM):
             for j in range(len(listaM)):
                 distancia = ((math.sqrt(
                     (listaV[i].x-listaM[j].x)**2 + (listaV[i].y-listaM[j].y)**2)), j)
-                aux.append(distancia)
+                aux.append(deepcopy(distancia))
 
             listaV[i].listdistM = sorted(aux)
             #print('\n\ni = ', i, 'distM = ', listaV[i].distM)
@@ -96,19 +102,44 @@ def fitness(dic, lista):
 
 def gerarPopulacao():
     n = 0
-    s = solucao([], [])
+    s = solucao(None, None)
+    listaSolucao = []
 
     while (n < 100):
         dic = {}
         listaVertices = deepcopy(montaVertice(listaEntrada))
         listaMed = deepcopy(gerarMedianas(listaVertices))
-        s.med.append(deepcopy(listaMed))
+        s.med = (deepcopy(listaMed))
         dic = deepcopy(conectaVertices(listaVertices, listaMed))
-        s.fit.append(deepcopy(fitness(dic, listaVertices)))
-        print("dicionario: ", dic)
-        print("fit ", s.fit)
+        s.fit = (deepcopy(fitness(dic, listaVertices)))
+        listaSolucao.append(deepcopy(s))
+
         n += 1
-    print(s.fit)
+    return listaSolucao
+
+
+def selecao(listaSol):
+    k = 5
+    i = 0
+    result = []
+    torneio = []
+    while True:
+        r = randint(0, len(listaSol)-1)
+        if r not in result:
+            result.append(r)
+            torneio.append(deepcopy(listaSol[r]))
+        if len(result) == k:
+            break
+
+    geradores = []
+    geradores = sorted(torneio)
+    for i in range(5):
+        print(geradores[i].fit)
+    pai = geradores[0]
+    mae = geradores[1]
+
+    print(pai.fit)
+    print(mae.fit)
 
 
 listaEntrada = []
@@ -118,7 +149,7 @@ numMedianas = int(entrada[1])
 for i in range(numVertices):
     listaEntrada.append(input().split())
 
-gerarPopulacao()
+selecao(gerarPopulacao())
 
 
 # for i in (listaVertices):
