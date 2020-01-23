@@ -194,19 +194,42 @@ def steadyStated(filho):  # atualiza a população
     filho.fit = deepcopy(conectaVertices(
         aux, filho.med))
     novalista = []
-    print('fit filho ', filho.fit)
-    print('fit ultimo ', listaSolucao[len(listaSolucao)-1].fit)
-    print('fit primeiro ', listaSolucao[0].fit)
-<<<<<<< HEAD
-=======
-
->>>>>>> 4d3633b6cc09c03c8728794c67d2d6fb3e79c0c1
     if filho.fit < listaSolucao[len(listaSolucao)-1].fit:
         listaSolucao.remove(listaSolucao[len(listaSolucao)-1])
         listaSolucao.append(filho)
 
     novalista = sorted(listaSolucao)
     return novalista
+
+
+def buscaLocal(filho):
+    result = []
+    aux = listaVertice
+    for i in range(numMedianas):
+        r = randint(0, (len(listaVertice)-1))
+        while listaVertice[r].idM == filho.med[i].idM:
+            print("entrou while")
+            r = randint(0, (len(listaVertice)-1))
+        if r not in result:
+            aux = deepcopy(montaVertice(listaEntrada))
+            result.append(deepcopy(r))
+            vizinho = deepcopy(filho)
+            vizinho.med[i] = deepcopy(listaVertice[r])
+            vizinho.med[i].idM = deepcopy(r)
+            vizinho.fit = deepcopy(conectaVertices(aux, vizinho.med))
+            print('fit filho ', filho.fit)
+            print('fit vizinho ', vizinho.fit)
+            if vizinho.fit < filho.fit:
+                print('MELHOR')
+                for j in filho.med:
+                    print('filho ', j.idM)
+                for j in vizinho.med:
+                    print('vizinho antes ', j.idM)
+                filho = deepcopy(vizinho)
+                # i = 0
+                print(i)
+                for j in filho.med:
+                    print('filho depois ', j.idM)
 
 
 listaEntrada = []
@@ -227,3 +250,4 @@ copiaPai = deepcopy(pai)
 copiaMae = deepcopy(mae)
 filho = mutacao(cruzamento(copiaPai, copiaMae))
 solucoes = steadyStated(filho)
+buscaLocal(filho)
