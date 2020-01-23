@@ -204,8 +204,10 @@ def steadyStated(filho):  # atualiza a população
 
 def buscaLocal(filho):
     result = []
-    aux = listaVertice
-    for i in range(numMedianas):
+
+    i = 0
+    while i < numMedianas:
+        aux = listaVertice
         r = randint(0, (len(listaVertice)-1))
         while listaVertice[r].idM == filho.med[i].idM:
             print("entrou while")
@@ -217,6 +219,7 @@ def buscaLocal(filho):
             vizinho.med[i] = deepcopy(listaVertice[r])
             vizinho.med[i].idM = deepcopy(r)
             vizinho.fit = deepcopy(conectaVertices(aux, vizinho.med))
+            print('I: ', i)
             print('fit filho ', filho.fit)
             print('fit vizinho ', vizinho.fit)
             if vizinho.fit < filho.fit:
@@ -226,10 +229,12 @@ def buscaLocal(filho):
                 for j in vizinho.med:
                     print('vizinho antes ', j.idM)
                 filho = deepcopy(vizinho)
-                # i = 0
-                print(i)
+                vizinho = solucao([], None)
+                i = 0
                 for j in filho.med:
                     print('filho depois ', j.idM)
+            else:
+                i += 1
 
 
 listaEntrada = []
