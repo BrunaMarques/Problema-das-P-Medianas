@@ -7,8 +7,8 @@ from copy import deepcopy
 class vertice:
     def __init__(self, x, y, capacidade, peso, listdistM, distM):  # construtor
         self.peso = peso
-        self.capacidade = capacidade - peso
         self.capacidadeR = capacidade
+        self.capacidade = capacidade - peso
         self.x = x
         self.y = y
         self.listdistM = listdistM
@@ -72,6 +72,9 @@ def distanciaMediana(listaV, listaM):
 
 def listaPriori(listaV, listaM):
     diferenca = []
+    zerar = []
+    for i in range(len(listaV)):
+        listaV[i].listdistM = zerar
     distanciaMediana(listaV, listaM)
     for i in range(len(listaV)):
         for j in range(len(listaM)):
@@ -89,6 +92,8 @@ def conectaVertices(listaV, listaM):
     diferenca = []
     fitness = 0
     diferenca = deepcopy(listaPriori(listaV, listaM))
+    for i in range(len(listaV)):
+        listaV[i].capacidade = listaV[i].capacidadeR
     for i in diferenca:
         for j in listaV[i[1]].listdistM:
             if listaV[i[1]].alocado == True:
@@ -112,7 +117,7 @@ def gerarPopulacao():
     s = solucao(None, None)
     listaSolucao = []
 
-    while (n < 100):
+    while (n < 10):
         listaVertices = deepcopy(montaVertice(listaEntrada))
         listaMed = deepcopy(gerarMedianas(listaVertices))
         s.med = (deepcopy(listaMed))
@@ -182,9 +187,6 @@ def mutacao(filho):
                 filho.med.append(deepcopy(listaVertice[r2]))
                 listaVertice[filho.med[r].idM].idM = None
             n += 1
-    for i in filho.med:
-
-        i.capacidade = i.capacidadeR
 
     return filho
 
@@ -194,10 +196,6 @@ def steadyStated(filho):  # atualiza a população
     filho.fit = deepcopy(conectaVertices(
         aux, filho.med))
     novalista = []
-<<<<<<< HEAD
-
-=======
->>>>>>> 08a324705c86b73ac746ef9c09393340bc73c60d
     if filho.fit < listaSolucao[len(listaSolucao)-1].fit:
         listaSolucao.remove(listaSolucao[len(listaSolucao)-1])
         listaSolucao.append(filho)
@@ -255,13 +253,4 @@ copiaPai = deepcopy(pai)
 copiaMae = deepcopy(mae)
 filho = mutacao(cruzamento(copiaPai, copiaMae))
 solucoes = steadyStated(filho)
-<<<<<<< HEAD
-
-for i in range(len(listaVertices)):
-    print("vertice: ", listaVertices[i].idM)
-
-for j in range(len(listaMed)):
-    print("mediana: ", listaMed[j].idM)
-=======
 buscaLocal(filho)
->>>>>>> 08a324705c86b73ac746ef9c09393340bc73c60d
