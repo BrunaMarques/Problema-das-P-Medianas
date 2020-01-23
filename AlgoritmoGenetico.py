@@ -226,6 +226,7 @@ def steadyStated(filho):
         aux, filho.med))
     print('fit filho ', filho.fit)
     print('fit ultimo ', listaSolucao[len(listaSolucao)-1].fit)
+    print('fit primeiro ', listaSolucao[0].fit)
     if filho.fit < listaSolucao[len(listaSolucao)-1].fit:
         listaSolucao.remove(listaSolucao[len(listaSolucao)-1])
         listaSolucao.append(filho)
