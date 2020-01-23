@@ -38,14 +38,14 @@ def montaVertice(lista):
     return listaVertice
 
 
-def gerarMedianas(lista):
+def gerarMedianas(listaV):
     medianas = []
     result = []
     while True:
         r = randint(0, numVertices-1)
         if r not in result:
-            lista[r].idM = deepcopy(r)
-            medianas.append(deepcopy(lista[r]))
+            listaV[r].idM = deepcopy(r)
+            medianas.append(deepcopy(listaV[r]))
 
             result.append(r)
         if len(result) == numMedianas:
@@ -125,7 +125,7 @@ def gerarPopulacao():
     s = solucao(None, None)
     listaSolucao = []
 
-    while (n < 10):
+    while (n < calculapop):
         listaVertices = deepcopy(montaVertice(listaEntrada))
         listaMed = deepcopy(gerarMedianas(listaVertices))
         s.med = (deepcopy(listaMed))
@@ -135,7 +135,6 @@ def gerarPopulacao():
         listaSolucao.append(deepcopy(s))
         n += 1
         listaAux = deepcopy(sorted(listaSolucao))
-        print(s.fit)
     return listaAux, listaVertices
 
 
@@ -186,6 +185,7 @@ def cruzamento(pai, mae):
 def mutacao(filho):
     n = 0
     result = []
+    aux = []
     while n < 2:
         r = randint(0, (len(filho.med)-1))
         r2 = randint(0, len(listaVertice)-1)
@@ -197,14 +197,16 @@ def mutacao(filho):
                 filho.med.append(deepcopy(listaVertice[r2]))
                 listaVertice[filho.med[r].idM].idM = None
             n += 1
+    aux = deepcopy(montaVertice(listaEntrada))
+    filho.fit = deepcopy(conectaVertices(aux, filho.med))
+    if filho.fit == False:
+        mutacao(filho)
 
     return filho
 
 
 def steadyStated(filho):  # atualiza a população
-    aux = deepcopy(montaVertice(listaEntrada))
-    filho.fit = deepcopy(conectaVertices(
-        aux, filho.med))
+
     novalista = []
     if filho.fit < listaSolucao[len(listaSolucao)-1].fit:
         listaSolucao.remove(listaSolucao[len(listaSolucao)-1])
@@ -222,52 +224,60 @@ def buscaLocal(filho):
         r = randint(0, (len(listaVertice)-1))
         while listaVertice[r].idM == filho.med[i].idM:
             r = randint(0, (len(listaVertice)-1))
-        if r not in result:
-            aux = deepcopy(montaVertice(listaEntrada))
-            result.append(deepcopy(r))
-            vizinho = deepcopy(filho)
-            vizinho.med[i] = deepcopy(aux[r])
-            vizinho.med[i].idM = deepcopy(r)
-            for k in range(len(vizinho.med)):
-                aux[vizinho.med[k].idM].idM = deepcopy(vizinho.med[k].idM)
-            vizinho.fit = deepcopy(conectaVertices(aux, vizinho.med))
-            print("I: ", i)
-            print("fit filho: ", filho.fit)
-            print("fit vizinho: ", vizinho.fit)
-            if vizinho.fit == False:
-                print("VIZINHO ", vizinho.fit)
-                continue
-            if vizinho.fit < filho.fit:
-                print("ENTROU IF")
-                for j in filho.med:
-                    print('filho ', j.idM)
-                for j in vizinho.med:
-                    print('vizinho ', j.idM)
-                filho = deepcopy(vizinho)
-                vizinho = solucao([], None)
-                i = 0
-                print(i)
-            else:
-                i += 1
+        aux = deepcopy(montaVertice(listaEntrada))
+        result.append(deepcopy(r))
+        vizinho = deepcopy(filho)
+        vizinho.med[i] = deepcopy(aux[r])
+        vizinho.med[i].idM = deepcopy(r)
+        for k in range(len(vizinho.med)):
+            aux[vizinho.med[k].idM].idM = deepcopy(vizinho.med[k].idM)
+        vizinho.fit = deepcopy(conectaVertices(aux, vizinho.med))
+        if vizinho.fit == False:
+            continue
+        if vizinho.fit < filho.fit:
+            filho = deepcopy(vizinho)
+            vizinho = solucao([], None)
+            i = 0
+        else:
+            i += 1
+    return filho
 
 
-listaEntrada = []
+def algoGenetico(listaS):
+    n = 0
+    while n < 300:
+        pai, mae = selecao(listaS)
+        copiaPai = deepcopy(pai)
+        copiaMae = deepcopy(mae)
+        filho = mutacao(cruzamento(copiaPai, copiaMae))
+        filho = buscaLocal(filho)
+        solucoes = steadyStated(filho)
+        n += 1
+    for i in solucoes:
+        print(i.fit)
+
+
 entrada = input().split()
 numVertices = int(entrada[0])
 numMedianas = int(entrada[1])
+calculapop = int(((17.5*(math.log(numVertices)))//2)*2)
+
+listaEntrada = []
+
 for i in range(numVertices):
     listaEntrada.append(input().split())
 
-
-listaVertices = deepcopy(montaVertice(listaEntrada))
-listaMed = deepcopy(gerarMedianas(listaVertices))
-fitness = conectaVertices(listaVertices, listaMed)
-print(fitness)
-# selecao(gerarPopulacao())
 listaSolucao, listaVertice = gerarPopulacao()
-pai, mae = selecao(listaSolucao)
-copiaPai = deepcopy(pai)
-copiaMae = deepcopy(mae)
-filho = mutacao(cruzamento(copiaPai, copiaMae))
-solucoes = steadyStated(filho)
-buscaLocal(filho)
+
+algoGenetico(listaSolucao)
+
+
+# fitness = conectaVertices(listaVertices, listaMed)
+# # selecao(gerarPopulacao())
+# listaSolucao, listaVertice = gerarPopulacao()
+# pai, mae = selecao(listaSolucao)
+# copiaPai = deepcopy(pai)
+# copiaMae = deepcopy(mae)
+# filho = mutacao(cruzamento(copiaPai, copiaMae))
+# solucoes = steadyStated(filho)
+# buscaLocal(filho)
