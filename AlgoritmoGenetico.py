@@ -5,7 +5,7 @@ from copy import deepcopy
 
 
 class vertice:
-    def __init__(self, x, y, capacidade, peso, listdistM, distM):  # construtor
+    def __init__(self, x, y, capacidade, peso, listdistM, distM, alocado, idM):  # construtor
         self.peso = peso
         self.capacidadeR = capacidade
         self.capacidade = capacidade - peso
@@ -33,7 +33,7 @@ def montaVertice(lista):
     listaVertice = []
     for i in range(len(lista)):
         v = vertice(int(lista[i][0]), int(lista[i][1]),
-                    int(lista[i][2]), int(lista[i][3]), None, None)
+                    int(lista[i][2]), int(lista[i][3]), [], [], False, None)
         listaVertice.append(deepcopy(v))
     return listaVertice
 
@@ -92,8 +92,11 @@ def conectaVertices(listaV, listaM):
     diferenca = []
     fitness = 0
     diferenca = deepcopy(listaPriori(listaV, listaM))
+    for j in range(len(listaM)):
+        listaM[j].capacidade = deepcopy(listaM[j].capacidadeR)
     for i in range(len(listaV)):
-        listaV[i].capacidade = listaV[i].capacidadeR
+        listaV[i].capacidade = deepcopy(listaV[i].capacidadeR)
+        listaV[i].alocado = False
     for i in diferenca:
         for j in listaV[i[1]].listdistM:
             if listaV[i[1]].alocado == True:
@@ -109,6 +112,11 @@ def conectaVertices(listaV, listaM):
                 listaV[i[1]].distM = deepcopy(j[0])
 
                 fitness = fitness + listaV[i[1]].distM
+    for i in range(len(listaV)):
+        for j in range(len(listaM)):
+            if listaV[i].idM != listaM[j].idM:
+                if listaV[i].alocado == False:
+                    return False
     return fitness
 
 
@@ -122,6 +130,8 @@ def gerarPopulacao():
         listaMed = deepcopy(gerarMedianas(listaVertices))
         s.med = (deepcopy(listaMed))
         s.fit = deepcopy(conectaVertices(listaVertices, listaMed))
+        if s.fit == False:
+            continue
         listaSolucao.append(deepcopy(s))
         n += 1
         listaAux = deepcopy(sorted(listaSolucao))
@@ -206,35 +216,37 @@ def steadyStated(filho):  # atualiza a população
 
 def buscaLocal(filho):
     result = []
-
+    aux = listaVertice
     i = 0
     while i < numMedianas:
-        aux = listaVertice
         r = randint(0, (len(listaVertice)-1))
         while listaVertice[r].idM == filho.med[i].idM:
-            print("entrou while")
             r = randint(0, (len(listaVertice)-1))
         if r not in result:
             aux = deepcopy(montaVertice(listaEntrada))
             result.append(deepcopy(r))
             vizinho = deepcopy(filho)
-            vizinho.med[i] = deepcopy(listaVertice[r])
+            vizinho.med[i] = deepcopy(aux[r])
             vizinho.med[i].idM = deepcopy(r)
+            for k in range(len(vizinho.med)):
+                aux[vizinho.med[k].idM].idM = deepcopy(vizinho.med[k].idM)
             vizinho.fit = deepcopy(conectaVertices(aux, vizinho.med))
-            print('I: ', i)
-            print('fit filho ', filho.fit)
-            print('fit vizinho ', vizinho.fit)
+            print("I: ", i)
+            print("fit filho: ", filho.fit)
+            print("fit vizinho: ", vizinho.fit)
+            if vizinho.fit == False:
+                print("VIZINHO ", vizinho.fit)
+                continue
             if vizinho.fit < filho.fit:
-                print('MELHOR')
+                print("ENTROU IF")
                 for j in filho.med:
                     print('filho ', j.idM)
                 for j in vizinho.med:
-                    print('vizinho antes ', j.idM)
+                    print('vizinho ', j.idM)
                 filho = deepcopy(vizinho)
                 vizinho = solucao([], None)
                 i = 0
-                for j in filho.med:
-                    print('filho depois ', j.idM)
+                print(i)
             else:
                 i += 1
 
