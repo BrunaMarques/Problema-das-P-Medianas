@@ -118,7 +118,8 @@ def gerarPopulacao():
         listaSolucao.append(deepcopy(s))
 
         n += 1
-    return listaSolucao
+        listaAux = deepcopy(sorted(listaSolucao))
+    return listaAux, listaVertices
 
 
 def selecao(listaSol):
@@ -167,6 +168,44 @@ def cruzamento(pai, mae):
     return filho
 
 
+def mutacao(filho):
+    n = 0
+    result = []
+    print('tamanho do filho.med ', len(filho.med))
+    for i in filho.med:
+        print('filho', i.idM)
+    while n < 2:
+        r = randint(0, (len(filho.med)-1))
+        r2 = randint(0, len(listaVertice)-1)
+        if r not in result:
+            result.append(deepcopy(r))
+            print("R2", r2, 'r', r)
+            if listaVertice[r2].idM != filho.med[r].idM:
+                filho.med.remove(filho.med[r])
+                listaVertice[r2].idM = r2
+                filho.med.append(deepcopy(listaVertice[r2]))
+            n += 1
+    for i in filho.med:
+        print
+        i.capacidade = i.capacidadeR
+        i.mediana = True
+
+    return filho
+
+
+def steadyStated(filho):
+    dicio = {}
+    aux = deepcopy(montaVertice(listaEntrada))
+    filho.fit = deepcopy(fitness(conectaVertices(
+        aux, filho.med), aux))
+    print('fit filho ', filho.fit)
+    print('fit ultimo ', listaSolucao[len(listaSolucao)-1].fit)
+    if filho.fit < listaSolucao[len(listaSolucao)-1].fit:
+        listaSolucao.remove(listaSolucao[len(listaSolucao)-1])
+        listaSolucao.append(filho)
+    print('fit ultimo altualizado ', listaSolucao[len(listaSolucao)-1].fit)
+
+
 listaEntrada = []
 entrada = input().split()
 numVertices = int(entrada[0])
@@ -174,8 +213,12 @@ numMedianas = int(entrada[1])
 for i in range(numVertices):
     listaEntrada.append(input().split())
 
-pai, mae = selecao(gerarPopulacao())
-cruzamento(pai, mae)
+listaSolucao, listaVertice = gerarPopulacao()
+pai, mae = selecao(listaSolucao)
+copiaPai = deepcopy(pai)
+copiaMae = deepcopy(mae)
+filho = mutacao(cruzamento(copiaPai, copiaMae))
+steadyStated(filho)
 
 
 # for i in (listaVertices):
