@@ -103,36 +103,6 @@ def conectaVertices(listaV, listaM):
                     fitness = fitness + listaV[i[1]].distM
     return fitness
 
-# def printarSolucao(listaV, listaM):
-#     vertic = []
-#     dic = {}
-#     conectaVertices(listaV, listaM)
-#     for i in listaV:
-#         print("---------")
-#         print(i.mediana)
-#         print(i.idteste)
-
-    # def conectaVertices(listaV, listaM):
-    #     dic = {}
-    #     distanciaMediana(listaV, listaM)
-    #     for j in range(len(listaM)):
-    #         v = []
-    #         for i in range(len(listaV)):
-    #             if listaV[i].mediana == False:
-    #                 if listaM[j].capacidade < listaV[i].peso:
-    #                     continue
-    #                 elif listaV[i].alocado == False:
-    #                     for k in range(len(listaV[i].listdistM)):
-    #                         if listaV[i].listdistM[k][1] == j:
-    #                             listaM[j].capacidade = listaM[j].capacidade - \
-    #                                 listaV[i].peso
-    #                             v.append(deepcopy(i))
-    #                             listaV[i].alocado = True
-    #                             listaV[i].distM = deepcopy(listaV[i].listdistM[k][0])
-    #         dic[j] = deepcopy(v)
-
-    #     return dic
-
 
 def gerarPopulacao():
     n = 0
@@ -227,6 +197,10 @@ def steadyStated(filho):
     print('fit filho ', filho.fit)
     print('fit ultimo ', listaSolucao[len(listaSolucao)-1].fit)
     print('fit primeiro ', listaSolucao[0].fit)
+<<<<<<< HEAD
+=======
+
+>>>>>>> 3b684dd81683e109b6227edb6432b3f6e81a4f43
     if filho.fit < listaSolucao[len(listaSolucao)-1].fit:
         listaSolucao.remove(listaSolucao[len(listaSolucao)-1])
         listaSolucao.append(filho)
@@ -251,9 +225,3 @@ copiaPai = deepcopy(pai)
 copiaMae = deepcopy(mae)
 filho = mutacao(cruzamento(copiaPai, copiaMae))
 steadyStated(filho)
-
-
-# for i in (listaVertices):
-#     print("AAAAAAA")
-#     print(i.idM)
-#     print('\n')
