@@ -115,7 +115,6 @@ def gerarPopulacao():
         s.med = (deepcopy(listaMed))
         s.fit = deepcopy(conectaVertices(listaVertices, listaMed))
         listaSolucao.append(deepcopy(s))
-
         n += 1
         listaAux = deepcopy(sorted(listaSolucao))
     return listaAux, listaVertices
@@ -190,17 +189,24 @@ def mutacao(filho):
     return filho
 
 
-def steadyStated(filho):
+def steadyStated(filho):  # atualiza a população
     aux = deepcopy(montaVertice(listaEntrada))
     filho.fit = deepcopy(conectaVertices(
         aux, filho.med))
+    novalista = []
     print('fit filho ', filho.fit)
     print('fit ultimo ', listaSolucao[len(listaSolucao)-1].fit)
     print('fit primeiro ', listaSolucao[0].fit)
+<<<<<<< HEAD
+=======
+
+>>>>>>> 4d3633b6cc09c03c8728794c67d2d6fb3e79c0c1
     if filho.fit < listaSolucao[len(listaSolucao)-1].fit:
         listaSolucao.remove(listaSolucao[len(listaSolucao)-1])
         listaSolucao.append(filho)
-    print('fit ultimo altualizado ', listaSolucao[len(listaSolucao)-1].fit)
+
+    novalista = sorted(listaSolucao)
+    return novalista
 
 
 listaEntrada = []
@@ -220,4 +226,4 @@ pai, mae = selecao(listaSolucao)
 copiaPai = deepcopy(pai)
 copiaMae = deepcopy(mae)
 filho = mutacao(cruzamento(copiaPai, copiaMae))
-steadyStated(filho)
+solucoes = steadyStated(filho)
