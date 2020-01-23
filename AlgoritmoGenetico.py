@@ -5,13 +5,12 @@ from copy import deepcopy
 
 
 class vertice:
-    def __init__(self, x, y, capacidade, peso, mediana, listdistM, distM):  # construtor
+    def __init__(self, x, y, capacidade, peso, listdistM, distM):  # construtor
         self.peso = peso
         self.capacidade = capacidade - peso
         self.capacidadeR = capacidade
         self.x = x
         self.y = y
-        self.mediana = mediana
         self.listdistM = listdistM
         self.distM = distM
         self.alocado = False
@@ -34,7 +33,7 @@ def montaVertice(lista):
     listaVertice = []
     for i in range(len(lista)):
         v = vertice(int(lista[i][0]), int(lista[i][1]),
-                    int(lista[i][2]), int(lista[i][3]), False, None, None)
+                    int(lista[i][2]), int(lista[i][3]), None, None)
         listaVertice.append(deepcopy(v))
     return listaVertice
 
@@ -47,7 +46,6 @@ def gerarMedianas(lista):
         if r not in result:
             lista[r].idM = deepcopy(r)
             medianas.append(deepcopy(lista[r]))
-            lista[r].mediana = True
 
             result.append(r)
         if len(result) == numMedianas:
@@ -60,13 +58,14 @@ def distanciaMediana(listaV, listaM):
     distancia = ()
     aux = []
     for i in range(len(listaV)):
-        if listaV[i].mediana != True:
-            for j in range(len(listaM)):
+        for j in range(len(listaM)):
+            if listaV[i].idM == listaM[j].idM:
+                continue
+            else:
                 distancia = ((math.sqrt(
                     (listaV[i].x-listaM[j].x)**2 + (listaV[i].y-listaM[j].y)**2)), j)
                 aux.append(deepcopy(distancia))
             listaV[i].listdistM = sorted(aux)
-            # print('\n\ni = ', i, 'distM = ', listaV[i].distM)
         distancia = []
         aux = []
 
@@ -75,10 +74,13 @@ def listaPriori(listaV, listaM):
     diferenca = []
     distanciaMediana(listaV, listaM)
     for i in range(len(listaV)):
-        if listaV[i].mediana == False:
-            aux = (deepcopy(listaV[i].listdistM[0]
-                            [0] - listaV[i].listdistM[1][0]), i)
-            diferenca.append(deepcopy(aux))
+        for j in range(len(listaM)):
+            if listaV[i].idM == listaM[j].idM:
+                continue
+            else:
+                aux = (deepcopy(listaV[i].listdistM[0]
+                                [0] - listaV[i].listdistM[1][0]), i)
+                diferenca.append(deepcopy(aux))
     diferenca = deepcopy(sorted(diferenca))
     return diferenca
 
@@ -91,16 +93,17 @@ def conectaVertices(listaV, listaM):
         for j in listaV[i[1]].listdistM:
             if listaV[i[1]].alocado == True:
                 continue
-            if listaV[i[1]].mediana == False:
-                if listaV[i[1]].peso > listaM[j[1]].capacidade:
-                    continue
-                else:
-                    listaM[j[1]].capacidade = deepcopy(listaM[j[1]
-                                                              ].capacidade - listaV[i[1]].peso)
-                    listaV[i[1]].alocado = True
-                    listaV[i[1]].distM = deepcopy(j[0])
+            if listaV[i[1]].idM == listaM[j[1]].idM:
+                continue
+            if listaV[i[1]].peso > listaM[j[1]].capacidade:
+                continue
+            else:
+                listaM[j[1]].capacidade = deepcopy(listaM[j[1]
+                                                          ].capacidade - listaV[i[1]].peso)
+                listaV[i[1]].alocado = True
+                listaV[i[1]].distM = deepcopy(j[0])
 
-                    fitness = fitness + listaV[i[1]].distM
+                fitness = fitness + listaV[i[1]].distM
     return fitness
 
 
@@ -117,6 +120,7 @@ def gerarPopulacao():
         listaSolucao.append(deepcopy(s))
         n += 1
         listaAux = deepcopy(sorted(listaSolucao))
+        print(s.fit)
     return listaAux, listaVertices
 
 
@@ -146,7 +150,7 @@ def cruzamento(pai, mae):
             if i.idM == j.idM:
                 aux2.append(deepcopy(i))
                 filho.med = aux2
-                pai.med.remove(i)
+                pai.med.remove(i)  # ver
                 mae.med.remove(j)
     result = []
     aux = True
@@ -167,24 +171,20 @@ def cruzamento(pai, mae):
 def mutacao(filho):
     n = 0
     result = []
-    print('tamanho do filho.med ', len(filho.med))
-    for i in filho.med:
-        print('filho', i.idM)
     while n < 2:
         r = randint(0, (len(filho.med)-1))
         r2 = randint(0, len(listaVertice)-1)
         if r not in result:
             result.append(deepcopy(r))
-            print("R2", r2, 'r', r)
             if listaVertice[r2].idM != filho.med[r].idM:
                 filho.med.remove(filho.med[r])
                 listaVertice[r2].idM = r2
                 filho.med.append(deepcopy(listaVertice[r2]))
+                listaVertice[filho.med[r].idM].idM = None
             n += 1
     for i in filho.med:
-        print
+
         i.capacidade = i.capacidadeR
-        i.mediana = True
 
     return filho
 
@@ -194,9 +194,6 @@ def steadyStated(filho):  # atualiza a população
     filho.fit = deepcopy(conectaVertices(
         aux, filho.med))
     novalista = []
-    print('fit filho ', filho.fit)
-    print('fit ultimo ', listaSolucao[len(listaSolucao)-1].fit)
-    print('fit primeiro ', listaSolucao[0].fit)
 
     if filho.fit < listaSolucao[len(listaSolucao)-1].fit:
         listaSolucao.remove(listaSolucao[len(listaSolucao)-1])
@@ -217,6 +214,7 @@ for i in range(numVertices):
 listaVertices = deepcopy(montaVertice(listaEntrada))
 listaMed = deepcopy(gerarMedianas(listaVertices))
 fitness = conectaVertices(listaVertices, listaMed)
+print(fitness)
 # selecao(gerarPopulacao())
 listaSolucao, listaVertice = gerarPopulacao()
 pai, mae = selecao(listaSolucao)
@@ -224,3 +222,9 @@ copiaPai = deepcopy(pai)
 copiaMae = deepcopy(mae)
 filho = mutacao(cruzamento(copiaPai, copiaMae))
 solucoes = steadyStated(filho)
+
+for i in range(len(listaVertices)):
+    print("vertice: ", listaVertices[i].idM)
+
+for j in range(len(listaMed)):
+    print("mediana: ", listaMed[j].idM)
