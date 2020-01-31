@@ -245,16 +245,15 @@ def buscaLocal(filho):
 
 def algoGenetico(listaS):
     n = 0
-    while n < 300:
+    while n < 200:
         pai, mae = selecao(listaS)
         copiaPai = deepcopy(pai)
         copiaMae = deepcopy(mae)
         filho = mutacao(cruzamento(copiaPai, copiaMae))
         filho = buscaLocal(filho)
         solucoes = steadyStated(filho)
+        print(solucoes[0].fit)
         n += 1
-    for i in solucoes:
-        print(i.fit)
 
 
 entrada = input().split()
@@ -270,14 +269,3 @@ for i in range(numVertices):
 listaSolucao, listaVertice = gerarPopulacao()
 
 algoGenetico(listaSolucao)
-
-
-# fitness = conectaVertices(listaVertices, listaMed)
-# # selecao(gerarPopulacao())
-# listaSolucao, listaVertice = gerarPopulacao()
-# pai, mae = selecao(listaSolucao)
-# copiaPai = deepcopy(pai)
-# copiaMae = deepcopy(mae)
-# filho = mutacao(cruzamento(copiaPai, copiaMae))
-# solucoes = steadyStated(filho)
-# buscaLocal(filho)
